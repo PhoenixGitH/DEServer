@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html>
+<title>DSL-Comet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<link rel="stylesheet" href="https://diagrameditorserver.herokuapp.com/style.css">
+<style>
+.mySlides {display:none}
+</style>
+<body>
+<br>
+<br>
+<h1>DSL-Comet</h1>
+<h2>A Domain Specific Language COllaborative Modelling EnvironmenT</h2>
+<br>
+<div id="cont">
+
+  <div id="left">
+    <div class="left-content">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_1.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_2.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_3.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_4.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_5.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_6.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_7.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_8.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_9.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_10.png">
+      <img class="mySlides" src="https://diagrameditorserver.herokuapp.com/IMG_11.png">
+
+    </div>
+
+      <div class="w3-section">
+        <button class="button" onclick="plusDivs(-1)" id="btnLeft">  ❮  </button>
+        <button class="button" onclick="plusDivs(1)" id="btnRight">  ❯  </button>
+      </div>
+
+  </div> <!-- left -->
+
+  <div id="right">
+  <p>DSL-comet is an iOs tool that allows graphical, collaborative modelling on mobile devices. 
+  <p>Our architecture permits creating both Sirius and mobile editors from a single description. 
+  <p>Models can be stored locally or in a server, and they are compatible with EMF technology
+  </div>
+
+ 
+
+</div> <!-- Container -->
+
+<br><br>
+<hr>
+
+<div id="links">
+  <h3>Links</h3>
+  <ul style="list-style-type:none">
+    <li>
+      <a href="https://diagrameditorserver.herokuapp.com/palettes"> Palettes </a>
+    </li>
+
+    <li>
+     <a href="https://diagrameditorserver.herokuapp.com/ecores"> Ecores </a>
+     </li>
+     <li>
+      <a href="https://diagrameditorserver.herokuapp.com/diagrams"> Models </a>
+      </li>
+
+  </ul>  
+</div>
+
+
+<br><br>
+<hr>
+<!--  Vídeos -->
+<div id="videos">
+  <h3>Videos</h3>
+  <p>Cooming soon...
+</div>
+
+
+<br><br>
+<hr>
+<!--  links -->
+<div id="links">
+  <h3>Links</h3>
+  <p>Cooming soon...
+</div>
+
+
+<br><br><br><br><br><br><br><br><br><br>
+<hr>
+
+<script>
+var slideIndex = 1;
+showDivs(slideIndex);
+var myVar = setInterval(myTimer, 3000);
+
+function myTimer() {
+   plusDivs(1);
+}
+
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+
+function currentDiv(n) {
+  showDivs(slideIndex = n);
+}
+
+
+
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("mySlides");
+  //var dots = document.getElementsByClassName("demo");
+  if (n > x.length) {slideIndex = 1}    
+  if (n < 1) {slideIndex = x.length} ;
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";  
+  }
+  //for (i = 0; i < dots.length; i++) {
+  //   dots[i].className = dots[i].className.replace(" w3-red", "");
+  //}
+  x[slideIndex-1].style.display = "block";  
+  //dots[slideIndex-1].className += " w3-red";
+}
+</script>
+
+</body>
+</html> 
+
