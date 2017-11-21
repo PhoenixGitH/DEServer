@@ -1324,7 +1324,7 @@ mongoose.connection.on("disconnected", function(){
 	mongoose.connection.close();
 });
 
-var str = "mongodb://" +user+":"+pass + "@ds047865.mongolab.com:47865/diagrameditor";
+var str = "mongodb://" +user+":"+pass + "@ds113826.mlab.com:13826/diagrameditor-restore";
 
 var options = {authMechanism: 'ScramSHA1'};  
 
