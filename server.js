@@ -1,4 +1,4 @@
-var express = require("express"),  
+var express = require("express"),
 app = express(),
 bodyParser  = require("body-parser"),
 methodOverride = require("method-override");
@@ -13,7 +13,7 @@ var childProcess = require('child_process');
 var mkdirp = require('mkdirp');
 
 
-var path = require('path'); 
+var path = require('path');
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(methodOverride());
@@ -50,7 +50,8 @@ var Palette = require("./models/palette");
 var Diagram = require("./models/diagram");
 var Ecore = require("./models/ecore");
 var Json = require("./models/json");
-
+var Role = require("./models/role");
+var User = require('./models/user')
 var database = "diagrameditor";
 
 
@@ -67,7 +68,7 @@ if (!fs.existsSync(dir)){
 //==============        Basic route      =================
 //========================================================
 
-router.get('/', function(req, res) {  
+router.get('/', function(req, res) {
 	console.log("/");
 	var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	console.log("ip: " + req.ip)
@@ -92,14 +93,13 @@ function sendJsonResponse(res, element){
 function sendJsonError(res, text){
 	//console.log("En sendJsonError. Text = "+ text);
 	res.setHeader("Content-Type", "application/json");
+  console.log(text);
 	res.send(JSON.stringify({error: text}));
 }
 
 function endResponse(res){
 	res.end();
 }
-
-
 
 
 //========================================================
@@ -145,7 +145,7 @@ router.get("/palettes", function(req, res){
 	}
 
 
-		
+
 
 });
 
@@ -365,7 +365,7 @@ router.post("/ecores", function(req, res){
 	}else{
 		generate = false;
 	}
-	
+
 	console.log("Check name");
 	if(name != undefined) {
 		console.log("Name != null = " + name);
@@ -380,7 +380,7 @@ router.post("/ecores", function(req, res){
 		console.log(newEcore);
 
 		newEcore.save(function(err){
-			
+
 			console.log("SAVE ecore. Error: " +err);
 
 			if(err){
@@ -430,14 +430,14 @@ router.post("/ecores", function(req, res){
 });
 
 function writeEcoreFileToFolder(ecore, uri){
-	
+
 	var name = path.join(__dirname, "/tmp/"+ecore.name +".ecore");
 
 	//var tempFilename = __dirname +"/files/ecores/"+ecore.name +".ecore";
 	console.log("ecore route: "+ name);
 
 
-	fs.writeFile(name, ecore.content, function(err){	
+	fs.writeFile(name, ecore.content, function(err){
 		console.log("vengo de intentar escribir. Err: "+err);
 		if(err){
 			console.log("Error escritura:  "+ err);
@@ -497,7 +497,7 @@ function saveJSONtoMongodb(jsonfile, name, uri){
 
 			}
 		});
-			  
+
 		});
 }
 
@@ -520,7 +520,7 @@ router.get("/ecores/:ename", function(req,res){
 				endResponse(res);
 			}
 		}else{
-			
+
 			if(req.query.json === "true"){
 				//Puede que el ecore no exista
 				console.log("ecore: "+req.params.ename);
@@ -529,7 +529,7 @@ router.get("/ecores/:ename", function(req,res){
 				}else{
 					sendJsonResponse(res, {code:200, body:ec});
 				}
-				
+
 			}else{
 				if(ec != null){
 					res.render("ecoreInfo",{
@@ -581,7 +581,7 @@ router.post("/ecores/:ename/delete", function(req, res){
 									sendJsonError(res, {code: 300, msg: err});
 								}
 							});
-								
+
 						}
 					});
 
@@ -663,7 +663,7 @@ router.get("/jsons/:name", function(req, res){
 
 //JSON by uri
 router.get("/jsonbyuri/", function(req, res){
-	
+
 	console.log("\t/jsonbyuri");
 	//Devuelvo un json con content el contenido del fichero
 
@@ -911,7 +911,7 @@ router.post("/exporter", function(req, res){
 	if(req.query.json === "true"){
 
 	}else{
-		
+
 
 		console.log("PUT /exporter \n");
 
@@ -962,10 +962,10 @@ router.post("/exporter", function(req, res){
 				}finally{
 					endResponse(res);
 				}
-			
+
 			});
 
-			
+
 		}
 	});
 }
@@ -985,9 +985,92 @@ router.get("/jsonTest", function(req, res){
 });
 
 
+//========================================================
+//=================    LOGIN CONTROLLER   ================
+//========================================================
+//Add a new user
+router.post("/register", function(req, res){
+	//a partir del ? vienen los parámetros
+	console.log("POST /register");
+
+	//var json = JSON.parse(req.body);
+	console.log(req.body);
+	console.log("name: "+req.body.name);
+	console.log("lastname: "+ req.body.lastname);
+	console.log("email: "+req.body.email);
+
+	var name = req.body.name;
+	var lastname = req.body.lastname;
+	var email = req.body.email;
+
+  var user = req.body.user;
+  //TODO: Encriptar
+	var password = req.body.password;
+  var role = req.body.role;
+
+	//var decodedImage = new Buffer(imageData, 'base64').toString('binary');
+
+	if(user != null) {
+		var newUser = User({
+			name: name,
+			lastname: lastname,
+			email : email,
+			user : user,
+			password:password,
+      role:role
+			//previewImage : {data : imageData, contentType :"image/png"}
+		});
+
+		newUser.save(function(err){
+			if(err){
+				console.log("Adding error: " + err);
+				sendJsonError(res, {code:300, msg:err});
+			}else{
+				console.log("User added");
+				//todo bien, devolvemos añadido correctamente
+				//if(req.query.json === "true"){
+					sendJsonResponse(res, {code:200, msg:"User added properly"});
+				//}else{
+					//res.redirect("");
+					//endResponse(res);
+				//}
+			}
+		});
+	}else{
+		endResponse(res);
+	}
+
+});
+
+//LOGIN
+router.post("/login/", function(req,res){
+	console.log("POST /login");
+
+  console.log(req.body.user);
+
+	User.findOne({user:req.body.user}, function(err, user){
+    if(err){
+      console.log("Adding error: " + err);
+      sendJsonError(res, {code:300, msg:err});
+    }else{
+      console.log("User found");
+      console.log(user);
+      //todo bien, comprobamos pass
+      if(user && req.body.password == user.password){
+        sendJsonResponse(res, {role:user.role, msg:"User logged in properly"});
+      }else{
+        //res.redirect("");
+        endResponse(res);
+      }
+    }
+
+  });
+});
+
+
 /*
 //========================================================
-//=================    BORRAR ANGEL   ===================
+//=================    BORRAR ANGEL   ====================
 //========================================================
 //Get all diagrams
 router.get("/fragments", function(req, res){
@@ -1031,14 +1114,14 @@ router.delete("/fragments", function(req, res){
 					}
 				}
 			});
-	
+
 });
 
 router.post("/fragments", function(req, res){
 	//a partir del ? vienen los parámetros
 	console.log("POST /fragments");
 
-	
+
 	console.log(req.body);
 	console.log("name: "+req.body.name);
 	console.log("content: "+req.body.content);
@@ -1046,7 +1129,7 @@ router.post("/fragments", function(req, res){
 
 	var name = req.body.name;
 	var content = req.body.content;
-	
+
 	var ext = req.body.extends;
 	var domains = req.body.domains;
 	var contentKeys = req.body.contentKeys;
@@ -1111,7 +1194,7 @@ router.post("/users", function(req, res){
 
 	console.log("POST /users");
 
-	
+
 	console.log(req.body);
 	console.log("name: "+req.body.name);
 	console.log("pass: "+req.body.pass);
@@ -1119,7 +1202,7 @@ router.post("/users", function(req, res){
 
 	var name = req.body.name;
 	var pass = req.body.pass;
-	
+
 
 	if(name != null) {
 		var newUser = User({
@@ -1175,7 +1258,7 @@ router.delete("/users", function(req, res){
 					}
 				}
 			});
-	
+
 });
 
 
@@ -1225,14 +1308,14 @@ router.delete("/datatypes", function(req, res){
 					}
 				}
 			});
-	
+
 });
 
 router.post("/datatypes", function(req, res){
 	//a partir del ? vienen los parámetros
 	console.log("POST /datatypes");
 
-	
+
 	console.log(req.body);
 	console.log("name: "+req.body.name);
 	console.log("content: "+req.body.content);
@@ -1240,7 +1323,7 @@ router.post("/datatypes", function(req, res){
 
 	var name = req.body.name;
 	var content = req.body.content;
-	
+
 	var ext = req.body.extend;
 	var contentKeys = req.body.contentKeys;
 
@@ -1307,7 +1390,7 @@ mongoose.connection.once("open", function(){
 	console.log("We're connected! Start listening...");
 
 	//Start listening
-	app.listen(port, function() {  
+	app.listen(port, function() {
 		console.log("Node server running, listening on port " +port);
 	});
 });
@@ -1326,19 +1409,12 @@ mongoose.connection.on("disconnected", function(){
 
 var str = "mongodb://" +user+":"+pass + "@ds115546.mlab.com:15546/diagrameditor";
 
-var options = {authMechanism: 'ScramSHA1'};  
+var options = {authMechanism: 'ScramSHA1'};
 
-var mongooseUri = uriUtil.formatMongoose(str);    
+var mongooseUri = uriUtil.formatMongoose(str);
 
 mongoose.connect(mongooseUri, options, function(err){
 	if(err){
 		console.log("Error: "+ err);
 	}
 });
-
-
-
-
-
-
-
